@@ -1,0 +1,8 @@
+# Config File
+
+gtf_file:
+  /home/groups/hoolock2/myfile.gtf
+
+star_index:
+  /home/groups/hoolock2/organism/star
+

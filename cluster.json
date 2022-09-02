@@ -1,0 +1,16 @@
+{
+    "__default__":
+    {
+        "account": "davibr",
+        "mem": "30G",
+        "time": "0-24:00",
+	"partition": "exacloud",
+	"cores": "8",
+	"nodes": "1"
+    },
+    "fastqc_raw":
+    {
+	"stdout": "logs/fastqcRaw_%A.out",
+	"stderr": "logs/fastqcRaw_%A.err"
+    }
+}
