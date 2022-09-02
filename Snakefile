@@ -22,7 +22,7 @@ rule fastqc_raw:
         fwd = "data/fastqc/raw/{sample}_R1_fastqc.zip",
         rev = "data/fastqc/raw/{sample}_R2_fastqc.zip"
     conda:
-        "envs/fastqc.yml"
+        "envs/fastqc.yaml"
     params:
         outdir = "data/fastqc/raw"
     shell:
