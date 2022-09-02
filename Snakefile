@@ -6,11 +6,12 @@ configfile:"proj_config.yaml"
 #project_id = config["project_id"]
 
 
+SAMPLES, = glob_wildcards("data/fastq/{sample}_R1.fastq.gz")
 
 
 rule all:
     input:
-        expand("data/fastqc/raw/{sample}.fastqc.html", sample=sample_dict.keys())
+        expand("data/fastqc/raw/{sample}_{dir}_fastqc.zip", sample = SAMPLES, dir = ["R1", "R2"])
 
 
 rule fastqc_raw:
