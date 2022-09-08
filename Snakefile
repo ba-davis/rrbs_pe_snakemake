@@ -42,7 +42,8 @@ rule trim_galore:
         rev = "data/fastq/{sample}_R2.fastq.gz"
     output:
         fwd = "data/trimming/{sample}_val_1.fq.gz",
-        rev = "data/trimming/{sample}_val_2.fq.gz"
+        rev = "data/trimming/{sample}_val_2.fq.gz",
+        expand("data/trimming/{sample}_{dir}.fastq.gz_trimming_report.txt", sample = SAMPLES, dir = ["R1", "R2"])
     conda:
         "envs/trimgalore.yaml"
     params:
@@ -70,7 +71,8 @@ rule bismark_aln:
         fwd = "data/trimming/{sample}_val_1.fq.gz",
         rev = "data/trimming/{sample}_val_2.fq.gz"
     output:
-        bam = "data/bismark_aln/{sample}_val_1_bismark_bt2_pe.bam"
+        bam = "data/bismark_aln/{sample}_val_1_bismark_bt2_pe.bam",
+        expand("data/bismark_aln/{sample}_val_1_bismark_bt2_PE_report.txt", sample = SAMPLES)
     conda:
         "envs/bismark.yaml"
     params:
