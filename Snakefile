@@ -16,7 +16,9 @@ rule all:
         expand("data/trimming/{sample}_val_{dir}.fq.gz", sample = SAMPLES, dir = ["1", "2"]),
         expand("data/fastqc/trim/{sample}_val_{dir}_fastqc.zip", sample = SAMPLES, dir = ["1", "2"]),
         expand("data/bismark_aln/{sample}_val_1_bismark_bt2_pe.bam", sample = SAMPLES),
-        "data/fastqc/raw/fqc_stats.table.txt"
+        "data/fastqc/raw/fqc_stats.table.txt",
+        "data/trimming/trimgalore_stats.txt",
+        "data/bismark_aln/bismark_stats.txt"
         
 
 
@@ -91,7 +93,20 @@ rule collect_trimgalore_metrics:
     input:
         expand("data/trimming/{sample}_{dir}.fastq.gz_trimming_report.txt", sample = SAMPLES, dir = ["R1", "R2"])
     output:
-        "data/trimming/"
+        "data/trimming/trimgalore_stats.txt"
     params:
-
+        inpath = "data/trimming"
+        outfile = "data/trimming/trimgalore_stats.txt"
     shell:
+        "scripts/parse.trimgalore.rrbs.pe.logs.py -d {params.inpath} -o {params.outfile}"
+
+rule collect_bismark_metrics:
+    input:
+        expand("data/bismark_aln/{sample}_val_1_bismark_bt2_PE_report.txt", sample = SAMPLES)
+    output:
+        "data/bismark_aln/bismark_stats.txt"
+    params:
+        inpath = "data/bismark_aln"
+        outfile = "data/bismark_aln/bismark_stats.txt"
+    shell:
+        "scripts/parse.bismark.pe.logs.py -d {params.inpath} -o {params.outfile}"

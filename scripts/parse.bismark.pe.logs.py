@@ -1,5 +1,3 @@
-#!/home/groups/hoolock2/u0/bd/miniconda3/envs/python3_general/bin/python
-
 #---------------------------------------------------------------------------#
 # Purpose: to parse relevant info from a directory of bismark log files     #
 #          and produce an outfile containing a table of stats per sample    #
@@ -12,7 +10,7 @@
 #       - Written for PE files (looks for "Sequence pairs analysed in total" line)
 #       - Don't need path to trimmed files anymore
 
-# TODO: - Make it PE or SE agnostic? Grab for something that is in both reports
+# TO DO: - Make it PE or SE agnostic? Grab for something that is in both reports
 #       - OR make a PE version and a SE version
 
 
