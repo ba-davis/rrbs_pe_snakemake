@@ -13,7 +13,8 @@ rule all:
     input:
         expand("data/fastqc/raw/{sample}_{dir}_fastqc.zip", sample = SAMPLES, dir = ["R1", "R2"]),
         expand("data/trimming/{sample}_val_{dir}.fq.gz", sample = SAMPLES, dir = ["1", "2"]),
-        expand("data/fastqc/trim/{sample}_val_{dir}_fastqc.zip", sample = SAMPLES, dir = ["1", "2"])
+        expand("data/fastqc/trim/{sample}_val_{dir}_fastqc.zip", sample = SAMPLES, dir = ["1", "2"]),
+        expand("data/bismark_aln/{sample}_val_1_bismark_bt2_pe.bam", sample = SAMPLES)
 
 
 rule fastqc_raw:
@@ -58,3 +59,17 @@ rule fastqc_trim:
         outdir = "data/fastqc/trim"
     shell:
         "fastqc -o {params.outdir} {input.fwd} {input.rev}"
+
+rule bismark_aln:
+    input:
+        fwd = "data/trimming/{sample}_val_1.fq.gz",
+        rev = "data/trimming/{sample}_val_2.fq.gz"
+    output:
+        bam = "data/bismark_aln/{sample}_val_1_bismark_bt2_pe.bam"
+    conda:
+        "envs/bismark.yaml"
+    params:
+        genome_dir = config["bismark_ref_genome"],
+	    outdir = "data/bismark_aln"
+    shell:
+        "bismark -p 4 {params.genome_dir} -1 {input.fwd} -2 {input.rev} -o {params.outdir} --bam"
