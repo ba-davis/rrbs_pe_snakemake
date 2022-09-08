@@ -48,7 +48,7 @@ rule trim_galore:
 rule fastqc_trim:
     input:
         fwd = "data/trimming/{sample}_val_1.fq.gz",
-        rev = "data/fastq/{sample}_val_2.fq.gz"
+        rev = "data/trimming/{sample}_val_2.fq.gz"
     output:
         fwd = "data/fastqc/trim/{sample}_val_1_fastqc.zip",
         rev = "data/fastqc/trim/{sample}_val_2_fastqc.zip"
