@@ -39,7 +39,7 @@ rule trim_galore:
     conda:
         "envs/trimgalore.yaml"
     params:
-        basename = "{sample}"
+        basename = "{sample}",
         outdir = "data/trimming",
 	    fastqc_dir = "data/fastqc/trimmed"
     shell:
