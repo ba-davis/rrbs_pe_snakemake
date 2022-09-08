@@ -95,7 +95,7 @@ rule collect_trimgalore_metrics:
     output:
         "data/trimming/trimgalore_stats.txt"
     params:
-        inpath = "data/trimming"
+        inpath = "data/trimming",
         outfile = "data/trimming/trimgalore_stats.txt"
     shell:
         "scripts/parse.trimgalore.rrbs.pe.logs.py -d {params.inpath} -o {params.outfile}"
@@ -106,7 +106,7 @@ rule collect_bismark_metrics:
     output:
         "data/bismark_aln/bismark_stats.txt"
     params:
-        inpath = "data/bismark_aln"
+        inpath = "data/bismark_aln",
         outfile = "data/bismark_aln/bismark_stats.txt"
     shell:
         "scripts/parse.bismark.pe.logs.py -d {params.inpath} -o {params.outfile}"
