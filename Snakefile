@@ -12,7 +12,7 @@ SAMPLES, = glob_wildcards("data/fastq/{sample}_R1.fastq.gz")
 rule all:
     input:
         expand("data/fastqc/raw/{sample}_{dir}_fastqc.zip", sample = SAMPLES, dir = ["R1", "R2"]),
-        expand("data/trimming/{sample}_{dir}_trimmed.fq.gz", sample = SAMPLES, dir = ["R1", "R2"])
+        expand("data/trimming/{sample}_val_{dir}.fq.gz", sample = SAMPLES, dir = ["1", "2"])
 
 
 rule fastqc_raw:
@@ -34,12 +34,13 @@ rule trim_galore:
         fwd = "data/fastq/{sample}_R1.fastq.gz",
         rev = "data/fastq/{sample}_R2.fastq.gz"
     output:
-        fwd = "data/trimming/{sample}_R1_trimmed.fq.gz",
-        rev = "data/trimming/{sample}_R2_trimmed.fq.gz"
+        fwd = "data/trimming/{sample}_val_1.fq.gz",
+        rev = "data/trimming/{sample}_val_2.fq.gz"
     conda:
         "envs/trimgalore.yaml"
     params:
+        basename = "{sample}"
         outdir = "data/trimming",
 	    fastqc_dir = "data/fastqc/trimmed"
     shell:
-        "trim_galore --paired -o {params.outdir} --rrbs {input.fwd} {input.rev}"
+        "trim_galore --paired --basename {params.basename} -o {params.outdir} --rrbs {input.fwd} {input.rev}"
