@@ -93,7 +93,7 @@ rule collect_fqc_metrics:
 
 rule collect_trimgalore_metrics:
     input:
-        expand("data/trimming/{sample}_{dir}.fastq.gz_trimming_report.txt", sample = SAMPLES, dir = ["R1", "R2"])
+        expand("data/trimming/{sample}_R2.fastq.gz_trimming_report.txt", sample = SAMPLES)
     output:
         "data/trimming/trimgalore_stats.txt"
     params:
