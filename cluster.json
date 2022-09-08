@@ -17,5 +17,10 @@
     {
         "stdout": "logs/trimgalore_%A.out",
         "stderr": "logs/trimgalore_%A.err"
+    },
+    "fastqc_trim":
+    {
+        "stdout": "logs/fastqcTrim_%A.out",
+        "stderr": "logs/fastqcTrim_%A.err"
     }
 }
