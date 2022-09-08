@@ -8,13 +8,16 @@ configfile:"proj_config.yaml"
 
 SAMPLES, = glob_wildcards("data/fastq/{sample}_R1.fastq.gz")
 
+localrules: collect_fqc_metrics
 
 rule all:
     input:
         expand("data/fastqc/raw/{sample}_{dir}_fastqc.zip", sample = SAMPLES, dir = ["R1", "R2"]),
         expand("data/trimming/{sample}_val_{dir}.fq.gz", sample = SAMPLES, dir = ["1", "2"]),
         expand("data/fastqc/trim/{sample}_val_{dir}_fastqc.zip", sample = SAMPLES, dir = ["1", "2"]),
-        expand("data/bismark_aln/{sample}_val_1_bismark_bt2_pe.bam", sample = SAMPLES)
+        expand("data/bismark_aln/{sample}_val_1_bismark_bt2_pe.bam", sample = SAMPLES),
+        "data/fastqc/raw/fqc_stats.table.txt"
+        
 
 
 rule fastqc_raw:
@@ -73,3 +76,22 @@ rule bismark_aln:
 	    outdir = "data/bismark_aln"
     shell:
         "bismark -p 4 {params.genome_dir} -1 {input.fwd} -2 {input.rev} -o {params.outdir} --bam"
+
+rule collect_fqc_metrics:
+    input:
+        expand("data/fastqc/raw/{sample}_{dir}_fastqc.zip", sample = SAMPLES, dir = ["R1", "R2"])
+    output:
+        "data/fastqc/raw/fqc_stats.table.txt"
+    params:
+        inpath = "data/fastqc/raw"
+    script:
+        "scripts/collect_fastqc_metrics_PE.sh {params.inpath}"
+
+rule collect_trimgalore_metrics:
+    input:
+        expand("data/trimming/{sample}_{dir}.fastq.gz_trimming_report.txt", sample = SAMPLES, dir = ["R1", "R2"])
+    output:
+        "data/trimming/"
+    params:
+
+    shell:
