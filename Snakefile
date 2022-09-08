@@ -41,6 +41,5 @@ rule trim_galore:
     params:
         basename = "{sample}",
         outdir = "data/trimming",
-	    fastqc_dir = "data/fastqc/trimmed"
     shell:
-        "trim_galore --paired --basename {params.basename} -o {params.outdir} --rrbs --fastqc_args '--outdir {params.fastqc_dir}' {input.fwd} {input.rev}"
+        "trim_galore --paired --basename {params.basename} -o {params.outdir} --rrbs {input.fwd} {input.rev}"
