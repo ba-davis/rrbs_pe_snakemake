@@ -13,12 +13,12 @@ localrules: collect_fqc_metrics, collect_trimgalore_metrics, collect_bismark_met
 rule all:
     input:
         expand("data/fastqc/raw/{sample}_{dir}_fastqc.zip", sample = SAMPLES, dir = ["R1", "R2"]),
-        expand("data/trimming/{sample}_val_{dir}.fq.gz", sample = SAMPLES, dir = ["1", "2"])
-        #expand("data/fastqc/trim/{sample}_val_{dir}_fastqc.zip", sample = SAMPLES, dir = ["1", "2"]),
-        #expand("data/bismark_aln/{sample}_val_1_bismark_bt2_pe.bam", sample = SAMPLES),
-        #"data/fastqc/raw/fqc_stats.table.txt",
-        #"data/trimming/trimgalore_stats.txt",
-        #"data/bismark_aln/bismark_stats.txt"
+        expand("data/trimming/{sample}_val_{dir}.fq.gz", sample = SAMPLES, dir = ["1", "2"]),
+        expand("data/fastqc/trim/{sample}_val_{dir}_fastqc.zip", sample = SAMPLES, dir = ["1", "2"]),
+        expand("data/bismark_aln/{sample}_val_1_bismark_bt2_pe.bam", sample = SAMPLES),
+        "data/fastqc/raw/fqc_stats.table.txt",
+        "data/trimming/trimgalore_stats.txt",
+        "data/bismark_aln/bismark_stats.txt"
         
 
 
@@ -52,63 +52,63 @@ rule trim_galore:
     shell:
         "trim_galore --paired --basename {params.basename} -o {params.outdir} --rrbs {input.fwd} {input.rev}"
 
-#rule fastqc_trim:
-#    input:
-#        fwd = "data/trimming/{sample}_val_1.fq.gz",
-#        rev = "data/trimming/{sample}_val_2.fq.gz"
-#    output:
-#        fwd = "data/fastqc/trim/{sample}_val_1_fastqc.zip",
-#        rev = "data/fastqc/trim/{sample}_val_2_fastqc.zip"
-#    conda:
-#        "envs/fastqc.yaml"
-#    params:
-#        outdir = "data/fastqc/trim"
-#    shell:
-#        "fastqc -o {params.outdir} {input.fwd} {input.rev}"
+rule fastqc_trim:
+    input:
+        fwd = "data/trimming/{sample}_val_1.fq.gz",
+        rev = "data/trimming/{sample}_val_2.fq.gz"
+    output:
+        fwd = "data/fastqc/trim/{sample}_val_1_fastqc.zip",
+        rev = "data/fastqc/trim/{sample}_val_2_fastqc.zip"
+    conda:
+        "envs/fastqc.yaml"
+    params:
+        outdir = "data/fastqc/trim"
+    shell:
+        "fastqc -o {params.outdir} {input.fwd} {input.rev}"
 
-#rule bismark_aln:
-#    input:
-#        fwd = "data/trimming/{sample}_val_1.fq.gz",
-#        rev = "data/trimming/{sample}_val_2.fq.gz"
-#    output:
-#        "data/bismark_aln/{sample}_val_1_bismark_bt2_PE_report.txt",
-#        bam = "data/bismark_aln/{sample}_val_1_bismark_bt2_pe.bam"
-#    conda:
-#        "envs/bismark.yaml"
-#    params:
-#        genome_dir = config["bismark_ref_genome"],
-#	    outdir = "data/bismark_aln"
-#    shell:
-#        "bismark -p 4 {params.genome_dir} -1 {input.fwd} -2 {input.rev} -o {params.outdir} --bam"
+rule bismark_aln:
+    input:
+        fwd = "data/trimming/{sample}_val_1.fq.gz",
+        rev = "data/trimming/{sample}_val_2.fq.gz"
+    output:
+        "data/bismark_aln/{sample}_val_1_bismark_bt2_PE_report.txt",
+        bam = "data/bismark_aln/{sample}_val_1_bismark_bt2_pe.bam"
+    conda:
+        "envs/bismark.yaml"
+    params:
+        genome_dir = config["bismark_ref_genome"],
+	    outdir = "data/bismark_aln"
+    shell:
+        "bismark -p 4 {params.genome_dir} -1 {input.fwd} -2 {input.rev} -o {params.outdir} --bam"
 
-#rule collect_fqc_metrics:
-#    input:
-#        expand("data/fastqc/raw/{sample}_{dir}_fastqc.zip", sample = SAMPLES, dir = ["R1", "R2"])
-#    output:
-#        "data/fastqc/raw/fqc_stats.table.txt"
-#    params:
-#        inpath = "data/fastqc/raw"
-#    script:
-#        "scripts/collect_fastqc_metrics_PE.sh {params.inpath}"
+rule collect_fqc_metrics:
+    input:
+        expand("data/fastqc/raw/{sample}_{dir}_fastqc.zip", sample = SAMPLES, dir = ["R1", "R2"])
+    output:
+        "data/fastqc/raw/fqc_stats.table.txt"
+    params:
+        inpath = "data/fastqc/raw"
+    script:
+        "scripts/collect_fastqc_metrics_PE.sh {params.inpath}"
 
-#rule collect_trimgalore_metrics:
-#    input:
-#        expand("data/trimming/{sample}_R2.fastq.gz_trimming_report.txt", sample = SAMPLES)
-#    output:
-#        "data/trimming/trimgalore_stats.txt"
-#    params:
-#        inpath = "data/trimming",
-#        outfile = "data/trimming/trimgalore_stats.txt"
-#    shell:
-#        "scripts/parse.trimgalore.rrbs.pe.logs.py -d {params.inpath} -o {params.outfile}"
+rule collect_trimgalore_metrics:
+    input:
+        expand("data/trimming/{sample}_R2.fastq.gz_trimming_report.txt", sample = SAMPLES)
+    output:
+        "data/trimming/trimgalore_stats.txt"
+    params:
+        inpath = "data/trimming",
+        outfile = "data/trimming/trimgalore_stats.txt"
+    shell:
+        "scripts/parse.trimgalore.rrbs.pe.logs.py -d {params.inpath} -o {params.outfile}"
 
-#rule collect_bismark_metrics:
-#    input:
-#        expand("data/bismark_aln/{sample}_val_1_bismark_bt2_PE_report.txt", sample = SAMPLES)
-#    output:
-#        "data/bismark_aln/bismark_stats.txt"
-#    params:
-#        inpath = "data/bismark_aln",
-#        outfile = "data/bismark_aln/bismark_stats.txt"
-#    shell:
-#        "scripts/parse.bismark.pe.logs.py -d {params.inpath} -o {params.outfile}"
+rule collect_bismark_metrics:
+    input:
+        expand("data/bismark_aln/{sample}_val_1_bismark_bt2_PE_report.txt", sample = SAMPLES)
+    output:
+        "data/bismark_aln/bismark_stats.txt"
+    params:
+        inpath = "data/bismark_aln",
+        outfile = "data/bismark_aln/bismark_stats.txt"
+    shell:
+        "scripts/parse.bismark.pe.logs.py -d {params.inpath} -o {params.outfile}"
