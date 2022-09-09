@@ -88,7 +88,7 @@ rule collect_fqc_metrics:
         "data/fastqc/raw/fqc_stats.table.txt"
     params:
         inpath = "data/fastqc/raw"
-    script:
+    shell:
         "scripts/collect_fastqc_metrics_PE.sh {params.inpath}"
 
 rule collect_trimgalore_metrics:
