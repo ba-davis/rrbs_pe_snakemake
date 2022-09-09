@@ -31,7 +31,7 @@ outfile=opts.outfile
 # open outfile for writing
 fhw = open(outfile, "w+")
 # write colnames to outfile
-fhw.write('Fastq_File' + '\t' + 'Seqs_Processed' + '\t' + 'RRBS reads trimmed' + '\t' + 'Seqs_Pair_Validated' + '\t' + 'Seqs_Rm' + '\t' + 'Seqs_Rm_Perc' + '\n')
+fhw.write('Fastq_File' + '\t' + 'Seq_Pairs_Processed' + '\t' + 'RRBS_reads_trimmed' + '\t' + 'Seqs_Pair_Validated' + '\t' + 'Seqs_Rm' + '\t' + 'Seqs_Rm_Perc' + '\n')
 
 # for file ending in 'trimming_report.txt' in directory
 for file in os.listdir(in_dir):
@@ -46,7 +46,8 @@ for file in os.listdir(in_dir):
             for line in FILE:
                 if ('RUN STATISTICS FOR INPUT FILE' in line):
                     intname=line.split('/')[-1].rstrip()
-                    printList.append(intname + '\t')
+                    intname2=re.sub("(_R2.*)$", "", intname)
+                    printList.append(intname2 + '\t')
                 if ('sequences processed in total' in line):
                     intname=line.split(' ')[0]
                     printList.append(intname + '\t')

@@ -96,19 +96,23 @@ rule collect_trimgalore_metrics:
         expand("data/trimming/{sample}_R2.fastq.gz_trimming_report.txt", sample = SAMPLES)
     output:
         "data/trimming/trimgalore_stats.txt"
+    conda:
+        "envs/python3_general.yaml"
     params:
         inpath = "data/trimming",
         outfile = "data/trimming/trimgalore_stats.txt"
     shell:
-        "scripts/parse.trimgalore.rrbs.pe.logs.py -d {params.inpath} -o {params.outfile}"
+        "python scripts/parse.trimgalore.rrbs.pe.logs.py -d {params.inpath} -o {params.outfile}"
 
 rule collect_bismark_metrics:
     input:
         expand("data/bismark_aln/{sample}_val_1_bismark_bt2_PE_report.txt", sample = SAMPLES)
     output:
         "data/bismark_aln/bismark_stats.txt"
+    conda:
+        "envs/python3_general.yaml"
     params:
         inpath = "data/bismark_aln",
         outfile = "data/bismark_aln/bismark_stats.txt"
     shell:
-        "scripts/parse.bismark.pe.logs.py -d {params.inpath} -o {params.outfile}"
+        "python scripts/parse.bismark.pe.logs.py -d {params.inpath} -o {params.outfile}"
