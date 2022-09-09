@@ -8,7 +8,7 @@ configfile:"proj_config.yaml"
 
 SAMPLES, = glob_wildcards("data/fastq/{sample}_R1.fastq.gz")
 
-localrules: collect_fqc_metrics
+localrules: collect_fqc_metrics, collect_trimgalore_metrics, collect_bismark_metrics
 
 rule all:
     input:
