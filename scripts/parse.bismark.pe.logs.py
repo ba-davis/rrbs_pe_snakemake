@@ -51,7 +51,7 @@ for file in os.listdir(in_dir):
                 intname=line.split()[3]
                 intname2=intname.split('/')[-1]
                 intname3=re.sub("(_val_1.*)$", "", intname2)
-                printList.append(intname2 + '\t')
+                printList.append(intname3 + '\t')
             # Obtain Number of Seq Pairs Analyzed
             if ('Sequence pairs analysed in total' in line):
                 intname=line.split('\t')[1].rstrip()
