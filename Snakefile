@@ -18,7 +18,8 @@ rule all:
         expand("data/bismark_aln/{sample}_val_1_bismark_bt2_pe.bam", sample = SAMPLES),
         "data/fastqc/raw/fqc_stats.table.txt",
         "data/trimming/trimgalore_stats.txt",
-        "data/bismark_aln/bismark_stats.txt"
+        "data/bismark_aln/bismark_stats.txt",
+        expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.CpG_report.txt.gz", sample = SAMPLES)
         
 
 
@@ -116,3 +117,19 @@ rule collect_bismark_metrics:
         outfile = "data/bismark_aln/bismark_stats.txt"
     shell:
         "python scripts/parse.bismark.pe.logs.py -d {params.inpath} -o {params.outfile}"
+
+rule meth_extract:
+    input:
+        bam = "data/bismark_aln/{sample}_val_1_bismark_bt2_pe.bam"
+    output:
+        "data/meth_extract/{sample}_val_1_bismark_bt2_pe.CpG_report.txt.gz",
+        "data/meth_extract/{sample}_val_1_bismark_bt2_pe.bismark.cov.gz",
+        "data/meth_extract/{sample}_val_1_bismark_bt2_pe.bedGraph.gz",
+        "data/meth_extract/{sample}_val_1_bismark_bt2_pe.M-bias.txt"
+    conda:
+        "envs/bismark.yaml"
+    params:
+        genome_dir = config["bismark_ref_genome"],
+        outdir = "data/meth_extract"
+    shell:
+        "bismark_methylation_extractor -p --comprehensive --merge_non_CpG --bedGraph --cytosine_report --genome_folder {params.genome_dir} -o {params.outdir} {input.bam}" 
