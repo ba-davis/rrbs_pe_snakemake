@@ -6,3 +6,29 @@ gtf_file:
 bismark_ref_genome:
   /home/groups/hoolock2/u0/genomes/ensembl/homo_sapiens/primary_assembly
 
+metadata_file:
+  "metadata.txt"
+
+group_var:
+  "group" # colname of metadata file to define groups
+
+min_cov:
+  1 # minimum cov for cpg's during object read-in
+
+min_cov_merge:
+  10 # minimum cov for merging samples
+
+perc_merge:
+  99.9 # high percentage cov cutoff for merging samples
+
+merge_regional:
+  FALSE # whether to merge on cpg-level (FALSE) or merge tiles (TRUE)
+
+min_cpg_region:
+  10 # if merging regions, minimum number of covered CpGs required in the region to retain it
+
+mpg:
+  "NULL" # min per group parameter for merging, NULL means all samples
+
+#treatment_vector:
+#  1,1,3,3,1,3,2,2,4,4,2,2,4,4,2,2,4,4,1,1,3,3,4,4,6,6,6,6,6,6,2,2,4,4,6,6,6,6,6,6,4,4,5,5,5,5,5,5,5,5,5,5,5,5,2,2,2,2,1,1,3,3,1,1,3,3,1,1,3,3,3

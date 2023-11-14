@@ -19,8 +19,8 @@ rule all:
         "data/fastqc/raw/fqc_stats.table.txt",
         "data/trimming/trimgalore_stats.txt",
         "data/bismark_aln/bismark_stats.txt",
-        expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.CpG_report.txt.gz", sample = SAMPLES)
-        
+        expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.CpG_report.txt.gz", sample = SAMPLES),
+        "data/ide/ide_complete.txt"
 
 
 rule fastqc_raw:
@@ -133,3 +133,25 @@ rule meth_extract:
         outdir = "data/meth_extract"
     shell:
         "bismark_methylation_extractor -p --comprehensive --merge_non_CpG --bedGraph --cytosine_report --gzip --genome_folder {params.genome_dir} -o {params.outdir} {input.bam}" 
+
+rule methylkit_ide:
+    input:
+        cov_file = "data/meth_extract/{sample}_val_1_bismark_bt2_pe.bismark.cov.gz"
+    output:
+        "data/ide/ide_complete.txt"
+    conda:
+        "envs/methylkit.yaml"
+    params:
+        inpath = "data/meth_extract",
+        metadata = config["metadata_file"],
+        group_var = config["group_var"],
+        min_cov = config["min_cov"],
+        outdir = "data/ide",
+        min_cov_merge = config["min_cov_merge"],
+        perc_merge = config["perc_merge"],
+        merge_regional = config["merge_regional"],
+        min_cpg_region = config["min_cpg_region"],
+        mpg = config["mpg"]
+        
+    shell:
+        "Rscript scripts/run_methylkit_ide.R {params.inpath} {params.metadata} {params.group_var} {params.min_cov} {params.outdir} {params.min_cov_merge} {params.perc_merge} {params.merge_regional} {params.min_cpg_region} {params.mpg}"
