@@ -8,7 +8,7 @@ configfile:"proj_config.yaml"
 
 SAMPLES, = glob_wildcards("data/fastq/{sample}_R1.fastq.gz")
 
-localrules: collect_fqc_metrics, collect_trimgalore_metrics, collect_bismark_metrics
+localrules: collect_fqc_metrics, collect_trimgalore_metrics, collect_bismark_metrics, join_metrics
 
 rule all:
     input:
@@ -16,12 +16,12 @@ rule all:
         expand("data/trimming/{sample}_val_{dir}.fq.gz", sample = SAMPLES, dir = ["1", "2"]),
         expand("data/fastqc/trim/{sample}_val_{dir}_fastqc.zip", sample = SAMPLES, dir = ["1", "2"]),
         expand("data/bismark_aln/{sample}_val_1_bismark_bt2_pe.bam", sample = SAMPLES),
-        "data/fastqc/raw/fqc_stats.table.txt",
+        "data/fastqc/raw/fqc_stats_table.txt",
         "data/trimming/trimgalore_stats.txt",
         "data/bismark_aln/bismark_stats.txt",
+	"data/preprocessing_metrics/metrics.txt",
         expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.CpG_report.txt.gz", sample = SAMPLES),
         "data/ide/ide_complete.txt"
-
 
 rule fastqc_raw:
     input:
@@ -86,7 +86,7 @@ rule collect_fqc_metrics:
     input:
         expand("data/fastqc/raw/{sample}_{dir}_fastqc.zip", sample = SAMPLES, dir = ["R1", "R2"])
     output:
-        "data/fastqc/raw/fqc_stats.table.txt"
+        "data/fastqc/raw/fqc_stats_table.txt"
     params:
         inpath = "data/fastqc/raw"
     shell:
@@ -118,6 +118,18 @@ rule collect_bismark_metrics:
     shell:
         "python scripts/parse.bismark.pe.logs.py -d {params.inpath} -o {params.outfile}"
 
+rule join_metrics:
+    input:
+        fqc = "data/fastqc/raw/fqc_stats_table.txt",
+	trim = "data/trimming/trimgalore_stats.txt",
+	aln = "data/bismark_aln/bismark_stats.txt"
+    output:
+        "data/preprocessing_metrics/metrics.txt"
+    params:
+        outfile = "data/preprocessing_metrics/metrics.txt"
+    shell:
+        "join -t $'\t' {input.fqc} {input.trim} | join -t $'\t' - {input.aln} > {params.outfile}"
+
 rule meth_extract:
     input:
         bam = "data/bismark_aln/{sample}_val_1_bismark_bt2_pe.bam"
@@ -136,7 +148,7 @@ rule meth_extract:
 
 rule methylkit_ide:
     input:
-        cov_file = "data/meth_extract/{sample}_val_1_bismark_bt2_pe.bismark.cov.gz"
+        expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.bismark.cov.gz", sample = SAMPLES)
     output:
         "data/ide/ide_complete.txt"
     conda:
@@ -151,7 +163,9 @@ rule methylkit_ide:
         perc_merge = config["perc_merge"],
         merge_regional = config["merge_regional"],
         min_cpg_region = config["min_cpg_region"],
-        mpg = config["mpg"]
+        mpg = config["mpg"],
+	merge_dirname = config["merge_dirname"],
+	repeat_initial_ide = config["repeat_initial_ide"]
         
     shell:
-        "Rscript scripts/run_methylkit_ide.R {params.inpath} {params.metadata} {params.group_var} {params.min_cov} {params.outdir} {params.min_cov_merge} {params.perc_merge} {params.merge_regional} {params.min_cpg_region} {params.mpg}"
+        "Rscript scripts/run_methylkit_ide.R {params.inpath} {params.metadata} {params.group_var} {params.min_cov} {params.outdir} {params.min_cov_merge} {params.perc_merge} {params.merge_regional} {params.min_cpg_region} {params.mpg} {params.merge_dirname} {params.repeat_initial_ide}"
