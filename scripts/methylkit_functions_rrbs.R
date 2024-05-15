@@ -34,6 +34,7 @@ library(ggplot2)
 library(scales)
 library(ggrepel)
 library(dplyr)
+library(impute)
 #library(umap)
 #library(tidyr)
 #library(gridExtra) # for arranging multi-sample plots on one file
@@ -52,24 +53,28 @@ library(dplyr)
 create_obj <- function(inpath,  metadata, group_var = "group", min_cov = 1) {
   # capture the cov.file paths
   infiles <- list.files(inpath, pattern = "*.cov.gz$", full = TRUE)
+  print(infiles)
   sample_names <- gsub(paste0(inpath, "/"), "", infiles)
   sample_names <- gsub("_val_1_bismark_bt2_pe.bismark.cov.gz", "", sample_names)
-
+  print(head(sample_names))
+  
   # read in metadata table
   meta <- read.delim(metadata, header = TRUE)
-
+  print(head(meta))
   # create vector of treatments by selecting the element of the group column
   # matching the same order as the sample_names vector (taken from the list of input files)
   # we want the treatment vector to be in the same order as the input files
   treat <- meta[[group_var]][match(sample_names, meta$sample_name)]
   my_treat_numeric <- as.numeric(as.factor(treat))
-
+  print(head(treat))
+  print("reading in cov files")
   # use methRead function from methylKit to read in the cov.files
   myObj <- methRead(as.list(infiles),
                     sample.id = as.list(sample_names),
                     assembly = "genome",
                     treatment = my_treat_numeric,
                     pipeline = "bismarkCoverage",
+		    header = FALSE,
                     context = "CpG",
                     mincov = min_cov)
   return(myObj)
@@ -345,7 +350,7 @@ number_cpg_at_cov_barplot <- function(cpg_cov_table, filename="cpg_10Xcov_barplo
 # min_cpg: remove regions with less than this number of covered cytosines (default 10)
 # mpg: minimin per group, number of samples per group the tile must appear in to be kept after merging (default NULL)
 # returns the meth object of merged tiled regions
-get_merged_regions <- function(myObj=myObj, min=10, max=99.9, normalize=TRUE, regional=TRUE, tile_size=1000, step_size=1000, min_cpg=10, mpg=NULL, destrand=FALSE, logfile = "ide_log.txt") {
+get_merged_regions <- function(myObj=myObj, min=10, max=99.9, normalize=TRUE, regional=TRUE, tile_size=1000, step_size=1000, min_cpg=10, mpg=NULL, destrand=FALSE, logfile = "ide_merge_log.txt") {
 
   # start connection to log file to store merging parameters
   sink(logfile, append = TRUE)
