@@ -58,5 +58,10 @@
     {
         "stdout": "logs/homer_%A.out",
         "stderr": "logs/homer_%A.err"
+    },
+    "homer_annotate":
+    {
+	"stdout": "logs/homer_annotate_%A.out",
+	"stderr": "logs/homer_annotate_%A.err"
     }
 }
