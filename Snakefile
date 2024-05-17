@@ -21,7 +21,10 @@ rule all:
         "data/bismark_aln/bismark_stats.txt",
 	"data/preprocessing_metrics/metrics.txt",
         expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.CpG_report.txt.gz", sample = SAMPLES),
-        "data/ide/ide_complete.txt"
+        "data/ide/ide_complete.txt",
+	"data/diff/methylkit_dmr/diff_complete.txt",
+	"data/diff/methylkit_dmr/annotation_complete.txt",
+	"data/homer/homer_complete.txt"
 
 rule fastqc_raw:
     input:
@@ -169,3 +172,67 @@ rule methylkit_ide:
         
     shell:
         "Rscript scripts/run_methylkit_ide.R {params.inpath} {params.metadata} {params.group_var} {params.min_cov} {params.outdir} {params.min_cov_merge} {params.perc_merge} {params.merge_regional} {params.min_cpg_region} {params.mpg} {params.merge_dirname} {params.repeat_initial_ide}"
+
+rule methylkit_dmr:
+    input:
+        meth_rds = "data/ide/RData/my_obj.RDS"
+    output:
+        "data/diff/methylkit_dmr/diff_complete.txt"
+    conda:
+        "envs/methylkit.yaml"
+    params:
+        lo_count = config["lo_count"],
+        hi_perc = config["hi_perc"],
+        cov_bases = config["cov_bases"],
+        tile_mpg = config["tile_mpg"],
+        design_file = config["design_file"],
+        outdir = "data/diff/methylkit_dmr"
+    shell:
+        """
+        Rscript scripts/methylkit_dmr.R \
+            {input.meth_rds} \
+            {params.lo_count} \
+            {params.hi_perc} \
+            {params.cov_bases} \
+            {params.tile_mpg} \
+            {params.design_file} \
+            {params.outdir}
+        """
+
+rule annotate_methylkit_dmrs:
+    input:
+        "data/diff/methylkit_dmr/diff_complete.txt"
+    output:
+        "data/diff/methylkit_dmr/annotation_complete.txt"
+    conda:
+        "envs/chipseeker.yaml"
+    params:
+        inpath = "data/diff/methylkit_dmr",
+	gtf_file = config["gtf_file"],
+	gene_info_file = config["gene_info_file"],
+	data_source = config["data_source"],
+	organism = config["organism"]
+    shell:
+        """
+	Rscript scripts/run_chipseeker.R \
+	    {params.inpath} \
+	    {params.gtf_file} \
+	    {params.gene_info_file} \
+	    {params.data_source} \
+	    {params.organism}
+	"""
+
+rule homer_dmrs:
+    input:
+        "data/diff/methylkit_dmr/diff_complete.txt"
+    output:
+        "data/homer/homer_complete.txt"
+    conda:
+        "envs/homer.yaml"
+    params:
+        inpath = "data/diff/methylkit_dmr",
+	genome_fa = config["genome_fa"],
+	ens_ref = config["ens_ref"],
+	homer_outdir = config["homer_outdir"]
+    shell:
+        "./scripts/run_homer_dmr.sh {params.inpath} {params.genome_fa} {params.ens_ref} {params.homer_outdir}"

@@ -36,3 +36,51 @@ merge_dirname:
 repeat_initial_ide:
   FALSE # when running IDE the first time, want to set as TRUE. When repeating merging, set to FALSE
 
+############################
+# MethylKit DMR Parameters #
+############################
+
+lo_count:
+  10 # minimum cpg coverage required before tiling
+
+hi_perc:
+  99.9 # maximum cpg coverage percentile before tiling
+
+cov_bases:
+  10 # min number of covered CpGs required in tiled region
+
+tile_mpg:
+  "NULL" # min samples per group a tile must appear in
+
+design_file:
+  "design.txt"
+
+#########################
+# Annotation Parameters #
+#########################
+
+gtf_file:
+  /home/groups/hoolock2/u0/genomes/ensembl/mus_musculus/annotation/Mus_musculus.GRCm38.99.gtf
+
+gene_info_file:
+  "NULL"
+
+data_source:
+  "GRCm38.99"
+
+organism:
+  "Mus_musculus"
+
+####################
+# HOMER Parameters #
+####################
+
+genome_fa:
+  "/home/groups/hoolock2/u0/genomes/ensembl/mus_musculus/Mus_musculus.GRCm38.dna.primary_assembly.fa" # path to the reference genome fasta to use with homer
+  
+ens_ref:
+  "TRUE" # if "TRUE", means you are using an ensembl ref genome with homer and the GREAT Bed files used as input need to have the "chr" removed
+
+homer_outdir:
+  "data/homer/" # relative path to place output folders
+  

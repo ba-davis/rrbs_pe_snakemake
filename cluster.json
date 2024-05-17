@@ -41,5 +41,22 @@
     {
         "stdout": "logs/ide_%A.out",
         "stderr": "logs/ide_%A.err"
+    },
+    "methylkit_dmr":
+    {
+        "stdout": "logs/methylkitDMR_%A.out",
+        "stderr": "logs/methylkitDMR_%A.err",
+        "mem": "500G",
+        "cores": "8"
+    },
+    "annotate_methylkit_dmrs":
+    {
+        "stdout": "logs/methylkitDMR_annot_%A.out",
+        "stderr": "logs/methylkitDMR_annot_%A.err"
+    },
+    "homer_dmrs":
+    {
+        "stdout": "logs/homer_%A.out",
+        "stderr": "logs/homer_%A.err"
     }
 }
