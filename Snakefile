@@ -25,7 +25,8 @@ rule all:
 	"data/diff/methylkit_dmr/diff_complete.txt",
 	"data/diff/methylkit_dmr/annotation_complete.txt",
 	"data/homer/homer_complete.txt",
-	"data/homer/homer_annotate_complete.txt"
+	"data/homer/homer_annotate_complete.txt",
+	"homer_subset_annot_complete.txt"
 
 rule fastqc_raw:
     input:
@@ -252,3 +253,15 @@ rule homer_annotate:
 	homer_outdir = config["homer_outdir"]
     shell:
         "./scripts/homer_annotate.sh {params.inpath} {params.genome_fa} {params.ens_ref} {params.homer_outdir}"
+
+rule homer_subset_annot:
+    input:
+        "data/homer/homer_annotate_complete.txt"
+    output:
+        "homer_subset_annot_complete.txt"
+    conda:
+        "envs/methylkit.yaml"
+    params:
+        homer_outdir = config["homer_outdir"]
+    shell:
+        "Rscript scripts/run_homer_subset_annot.R {params.homer_outdir}"

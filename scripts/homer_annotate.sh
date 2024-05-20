@@ -9,9 +9,9 @@ outdir_base=$4
 # cat *.motif > knownResults.all.motif
 
 # Use a for loop to iterate over all 'knownResults' directories
-for dir in */knownResults; do
+for dir in ${outdir_base}*/knownResults; do
     # Concatenate all .motif files in the current knownResults directory into knownResults.all.motif
-    #echo $dir
+    echo $dir
     cat "$dir"/*.motif > "$dir"/knownResults.all.motif
 done
 

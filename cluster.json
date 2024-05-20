@@ -63,5 +63,10 @@
     {
 	"stdout": "logs/homer_annotate_%A.out",
 	"stderr": "logs/homer_annotate_%A.err"
+    },
+    "homer_subset_annot":
+    {
+	"stdout": "logs/homer_sub_annot_%A.out",
+	"stderr": "logs/homer_sub_annot_%A.err"
     }
 }
