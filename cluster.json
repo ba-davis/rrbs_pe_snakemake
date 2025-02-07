@@ -4,7 +4,7 @@
         "account": "davibr",
         "mem": "30G",
         "time": "0-24:00",
-	"partition": "exacloud",
+	"partition": "batch",
 	"cores": "8",
 	"nodes": "1",
         "qos": "normal"
@@ -17,7 +17,8 @@
     "trim_galore":
     {
         "stdout": "logs/trimgalore_%A.out",
-        "stderr": "logs/trimgalore_%A.err"
+        "stderr": "logs/trimgalore_%A.err",
+	"time": "0-36:00"
     },
     "fastqc_trim":
     {
@@ -27,7 +28,6 @@
     "bismark_aln":
     {
         "qos": "long_jobs",
-        "mem": "72G",
         "time": "7-00",
         "stdout": "logs/bismark_%A.out",
         "stderr": "logs/bismark_%A.err"
@@ -35,18 +35,20 @@
     "meth_extract":
     {
         "stdout": "logs/meth_extract_%A.out",
-        "stderr": "logs/meth_extract_%A.err"
+        "stderr": "logs/meth_extract_%A.err",
+	"time": "0-36:00"
     },
     "methylkit_ide":
     {
         "stdout": "logs/ide_%A.out",
-        "stderr": "logs/ide_%A.err"
+        "stderr": "logs/ide_%A.err",
+	"mem": "72G"
     },
     "methylkit_dmr":
     {
         "stdout": "logs/methylkitDMR_%A.out",
         "stderr": "logs/methylkitDMR_%A.err",
-        "mem": "500G",
+        "mem": "72G",
         "cores": "8"
     },
     "annotate_methylkit_dmrs":
