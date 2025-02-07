@@ -82,7 +82,7 @@ print(mpg)
 # Set up directory structure
 # Produce plots and descriptions before merging
 
-if (!repeat_initial_ide) {
+if (repeat_initial_ide) {
   print("First time running IDE.")
   print("Will read in files to create and save methylRawList object.")
   print("Will explore coverage distribution of samples in the object.")
@@ -133,23 +133,24 @@ if (!repeat_initial_ide) {
 
   # create cov data object for plotting
   cov_dist_df <- get_cov_dist_df(my_obj)
-  #print(head(cov_dist_df))
-  # Plot a boxplot of all samples by number of cpgs covered
-  plot_cov_dist_boxplot(cov_dist_df = cov_dist_df,
-    filename = "num_cpg_boxplot.pdf",
-    fill_col = "lightskyblue1"
-  )
-  # Plot stacked barplot showing CpG cov per sample
-  plot_cov_bin_barplot(cov_dist_df = cov_dist_df,
-    filename = "cpg_cov_stacked_barplot.pdf"
-  )
-  # Plot stacked barplot, faceted by group
-  plot_cov_bin_barplot(cov_dist_df = cov_dist_df,
-    filename = "cpg_cov_stacked_barplot_facet.pdf",
-    group_facet = TRUE,
-    metadata = "../../metadata.txt",
-    groupbyvar = group_var
-  )
+  if (!(is.null(cov_dist_df))) {
+    # Plot a boxplot of all samples by number of cpgs covered
+    plot_cov_dist_boxplot(cov_dist_df = cov_dist_df,
+      filename = "num_cpg_boxplot.pdf",
+      fill_col = "lightskyblue1"
+    )
+    # Plot stacked barplot showing CpG cov per sample
+    plot_cov_bin_barplot(cov_dist_df = cov_dist_df,
+      filename = "cpg_cov_stacked_barplot.pdf"
+    )
+    # Plot stacked barplot, faceted by group
+    plot_cov_bin_barplot(cov_dist_df = cov_dist_df,
+      filename = "cpg_cov_stacked_barplot_facet.pdf",
+      group_facet = TRUE,
+      metadata = "../../metadata.txt",
+      groupbyvar = group_var
+    )
+  }
 
   # Plot Methylkit style cov histograms, one plot per sample
   makeCovPlots(my_obj)
@@ -212,10 +213,30 @@ saveRDS(perc_meth, "perc_meth.RDS")
 
 # If mpg is not null, perform imputation on CpGs without coverage in all samples
 # PCA requires no missing data
+# Note that impute.knn will fail if a column has > 80% missing values
+# For columns with > 80% missing values, those values will first be imputed
+# by column mean before applying impute.knn
 if (is.null(mpg)) {
   print("Min.per.group parameter is NULL. No imputation required.")
 } else {
   print("Min.per.group parameter is not NULL. Performing imputation.")
+  # Check % of missing values in each column
+  missing_percentage <- colMeans(is.na(perc_meth))
+  # Identify columns with more than 80% missing values
+  high_missing_cols <- names(missing_percentage[missing_percentage > 0.8])
+  # Count the number of columns with more than 80% missing values
+  num_cols_high_missing <- length(high_missing_cols)
+  # Print a message with column names
+  if (num_cols_high_missing > 0) {
+    message(num_cols_high_missing, " columns have > 80% missing values: ",
+      paste(high_missing_cols, collapse = ", "), 
+      ". These values will first be imputed by column mean.")
+    # Impute columns with > 80% missing values using the column mean
+    perc_meth[, high_missing_cols] <- apply(
+    perc_meth[, high_missing_cols, drop = FALSE], 
+    2, 
+    function(x) ifelse(is.na(x), mean(x, na.rm = TRUE), x))
+  }
   imputed.mat <- impute.knn(perc_meth)
   # Get percent methylation matrix (CpGs x Samples)
   imp.perc.meth <- imputed.mat$data
