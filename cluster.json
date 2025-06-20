@@ -18,7 +18,8 @@
     {
         "stdout": "logs/trimgalore_%A.out",
         "stderr": "logs/trimgalore_%A.err",
-	"time": "0-36:00"
+	"time": "0-36:00",
+	"mem": "120G"
     },
     "fastqc_trim":
     {
@@ -28,6 +29,7 @@
     "bismark_aln":
     {
         "qos": "long_jobs",
+        "mem": "172G",
         "time": "7-00",
         "stdout": "logs/bismark_%A.out",
         "stderr": "logs/bismark_%A.err"
@@ -36,19 +38,20 @@
     {
         "stdout": "logs/meth_extract_%A.out",
         "stderr": "logs/meth_extract_%A.err",
-	"time": "0-36:00"
+	"mem": "172G"
     },
     "methylkit_ide":
     {
         "stdout": "logs/ide_%A.out",
         "stderr": "logs/ide_%A.err",
-	"mem": "72G"
+	"mem": "999G",
+	"cores": "12"
     },
     "methylkit_dmr":
     {
         "stdout": "logs/methylkitDMR_%A.out",
         "stderr": "logs/methylkitDMR_%A.err",
-        "mem": "72G",
+        "mem": "500G",
         "cores": "8"
     },
     "annotate_methylkit_dmrs":

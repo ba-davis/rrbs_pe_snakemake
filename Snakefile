@@ -21,12 +21,13 @@ rule all:
         "data/bismark_aln/bismark_stats.txt",
 	"data/preprocessing_metrics/metrics.txt",
         expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.CpG_report.txt.gz", sample = SAMPLES),
-        "data/ide/ide_complete.txt",
-	"data/diff/methylkit_dmr/diff_complete.txt",
-	"data/diff/methylkit_dmr/annotation_complete.txt",
-	"data/homer/homer_complete.txt",
-	"data/homer/homer_annotate_complete.txt",
-	"homer_subset_annot_complete.txt"
+        "data/ide/ide_complete.txt"
+	#"data/diff/methylkit_dmr/diff_complete.txt",
+	#"data/diff/methylkit_dmr/annotation_complete.txt"
+	    #"data/homer/homer_complete.txt",
+	    #"data/homer/homer_annotate_complete.txt",
+	    #"homer_subset_annot_complete.txt"
+        #"data/reports/analysis.html"
 
 rule fastqc_raw:
     input:
@@ -126,8 +127,8 @@ rule collect_bismark_metrics:
 rule join_metrics:
     input:
         fqc = "data/fastqc/raw/fqc_stats_table.txt",
-	trim = "data/trimming/trimgalore_stats.txt",
-	aln = "data/bismark_aln/bismark_stats.txt"
+	    trim = "data/trimming/trimgalore_stats.txt",
+	    aln = "data/bismark_aln/bismark_stats.txt"
     output:
         "data/preprocessing_metrics/metrics.txt"
     params:
@@ -159,7 +160,7 @@ rule methylkit_ide:
     conda:
         "envs/methylkit.yaml"
     params:
-        inpath = "data/meth_extract",
+        inpath = config["covfile_path"],
         metadata = config["metadata_file"],
         group_var = config["group_var"],
         min_cov = config["min_cov"],
@@ -170,14 +171,20 @@ rule methylkit_ide:
         min_cpg_region = config["min_cpg_region"],
         mpg = config["mpg"],
 	merge_dirname = config["merge_dirname"],
-	repeat_initial_ide = config["repeat_initial_ide"]
-        
+	first_time_ide = config["first_time_ide"],
+        list_object = config["list_object"],
+        explore_cov = config["explore_cov"],
+        do_merge = config["do_merge"],
+        merged_obj = config["merged_obj"],
+        perc_meth_obj = config["perc_meth_obj"],
+        pca_label_var = config["pca_label_var"],
+        pca_color_var = config["pca_color_var"]
     shell:
-        "Rscript scripts/run_methylkit_ide.R {params.inpath} {params.metadata} {params.group_var} {params.min_cov} {params.outdir} {params.min_cov_merge} {params.perc_merge} {params.merge_regional} {params.min_cpg_region} {params.mpg} {params.merge_dirname} {params.repeat_initial_ide}"
+        "Rscript scripts/run_methylkit_ide.R {params.inpath} {params.metadata} {params.group_var} {params.min_cov} {params.outdir} {params.min_cov_merge} {params.perc_merge} {params.merge_regional} {params.min_cpg_region} {params.mpg} {params.merge_dirname} {params.first_time_ide} {params.list_object} {params.explore_cov} {params.do_merge} {params.merged_obj} {params.perc_meth_obj} {params.pca_label_var} {params.pca_color_var}"
 
 rule methylkit_dmr:
     input:
-        meth_rds = "data/ide/RData/my_obj.RDS"
+        meth_rds = "data/ide/RData/my_obj_5.RDS"
     output:
         "data/diff/methylkit_dmr/diff_complete.txt"
     conda:
@@ -233,9 +240,9 @@ rule homer_dmrs:
         "envs/homer.yaml"
     params:
         inpath = "data/diff/methylkit_dmr",
-	genome_fa = config["genome_fa"],
-	ens_ref = config["ens_ref"],
-	homer_outdir = config["homer_outdir"]
+	    genome_fa = config["genome_fa"],
+	    ens_ref = config["ens_ref"],
+	    homer_outdir = config["homer_outdir"]
     shell:
         "./scripts/run_homer_dmr.sh {params.inpath} {params.genome_fa} {params.ens_ref} {params.homer_outdir}"
 
@@ -248,9 +255,9 @@ rule homer_annotate:
         "envs/homer.yaml"
     params:
         inpath = "data/diff/methylkit_dmr",
-	genome_fa = config["genome_fa"],
-	ens_ref = config["ens_ref"],
-	homer_outdir = config["homer_outdir"]
+	    genome_fa = config["genome_fa"],
+	    ens_ref = config["ens_ref"],
+	    homer_outdir = config["homer_outdir"]
     shell:
         "./scripts/homer_annotate.sh {params.inpath} {params.genome_fa} {params.ens_ref} {params.homer_outdir}"
 
@@ -265,3 +272,24 @@ rule homer_subset_annot:
         homer_outdir = config["homer_outdir"]
     shell:
         "Rscript scripts/run_homer_subset_annot.R {params.homer_outdir}"
+
+rule generate_report:
+    input:
+        metrics_file="data/preprocessing_metrics/metrics.txt"
+    output:
+        report="reports/analysis.html"
+    params:
+        rmd_template = "analysis_report_template.Rmd",
+        project_name = config["project_name"],
+        metadata_file = config["metadata_file"]
+    shell:
+        """
+        Rscript -e "rmarkdown::render(
+            '{params.rmd_template}', 
+            output_file='{output.report}', 
+            params=list(
+                project_name={params.project_name},
+                metadata='{params.metadata_file}',
+                metrics={input.metrics_file}
+            ))"
+        """
