@@ -103,7 +103,7 @@ cov_bases:
   10 # min number of covered CpGs required in tiled region
 
 tile_mpg:
-  5 # min samples per group a tile must appear in
+  3 # min samples per group a tile must appear in
 
 design_file:
   "design.txt"
@@ -113,26 +113,26 @@ design_file:
 #########################
 
 gtf_file:
-  /home/groups/hoolock2/u0/genomes/ucsc/hg38/annotation/hg38.ncbiRefSeq.gtf
+  /home/groups/hoolock2/u0/genomes/ucsc/galGal6/annotation/galGal6.ensGene.gtf
 
 gene_info_file:
   "NULL"
 
 data_source:
-  "GRCh38"
+  "galGal6"
 
 organism:
-  "Homo_sapiens"
+  "Gallus_gallus"
 
 ####################
 # HOMER Parameters #
 ####################
 
 genome_fa:
-  "/home/groups/hoolock2/u0/genomes/ensembl/mus_musculus/Mus_musculus.GRCm38.dna.primary_assembly.fa" # path to the reference genome fasta to use with homer
+  "/home/groups/hoolock2/u0/genomes/ucsc/galGal6/galGal6.fa" # path to the reference genome fasta to use with homer
   
 ens_ref:
-  "TRUE" # if "TRUE", means you are using an ensembl ref genome with homer and the GREAT Bed files used as input need to have the "chr" removed
+  "FALSE" # if "TRUE", means you are using an ensembl ref genome with homer and the GREAT Bed files used as input need to have the "chr" removed
 
 homer_outdir:
   "data/homer/" # relative path to place output folders

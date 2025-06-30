@@ -21,12 +21,12 @@ rule all:
         "data/bismark_aln/bismark_stats.txt",
 	"data/preprocessing_metrics/metrics.txt",
         expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.CpG_report.txt.gz", sample = SAMPLES),
-        "data/ide/ide_complete.txt"
-	#"data/diff/methylkit_dmr/diff_complete.txt",
-	#"data/diff/methylkit_dmr/annotation_complete.txt"
-	    #"data/homer/homer_complete.txt",
-	    #"data/homer/homer_annotate_complete.txt",
-	    #"homer_subset_annot_complete.txt"
+        "data/ide/ide_complete.txt",
+	"data/diff/methylkit_dmr/diff_complete.txt",
+	"data/diff/methylkit_dmr/annotation_complete.txt",
+	"data/homer/homer_complete.txt",
+	"data/homer/homer_annotate_complete.txt",
+	"homer_subset_annot_complete.txt"
         #"data/reports/analysis.html"
 
 rule fastqc_raw:
@@ -184,7 +184,7 @@ rule methylkit_ide:
 
 rule methylkit_dmr:
     input:
-        meth_rds = "data/ide/RData/my_obj_5.RDS"
+        meth_rds = "data/ide/RData/my_obj.RDS"
     output:
         "data/diff/methylkit_dmr/diff_complete.txt"
     conda:
@@ -255,9 +255,9 @@ rule homer_annotate:
         "envs/homer.yaml"
     params:
         inpath = "data/diff/methylkit_dmr",
-	    genome_fa = config["genome_fa"],
-	    ens_ref = config["ens_ref"],
-	    homer_outdir = config["homer_outdir"]
+	genome_fa = config["genome_fa"],
+	ens_ref = config["ens_ref"],
+	homer_outdir = config["homer_outdir"]
     shell:
         "./scripts/homer_annotate.sh {params.inpath} {params.genome_fa} {params.ens_ref} {params.homer_outdir}"
 

@@ -66,17 +66,21 @@ subset_annot <- function(annot.out, known.res, qval=0.05, remove.homer.annot.col
 
 #-------------#
     # Now, remove columns from anno result table which are not found in the Motif.Name column of res
+    res2 <- res[res$Motif.Name %in% colnames(anno), ] # added because a case where comparison had 251 sig motifs, but HOMER only output 234 .motif files
+    res <- res2
     anno.sub <- anno[ ,res$Motif.Name]
     anno.sub2 <- cbind(anno[ ,c(1:21)], anno.sub)
     # convert blank values to NA
     anno.sub3 <- apply(anno.sub2, 2, function(x) gsub("^$|^ $", NA, x))
     # remove rows where there are NA values in every TF column
     num <- (ncol(anno.sub3) - 21) - 1
-    anno.sub4 <- anno.sub3[!(rowSums(is.na(anno.sub3[ ,c(22:ncol(anno.sub3))])) > num), ]
+    #anno.sub4 <- anno.sub3[!(rowSums(is.na(anno.sub3[ ,c(22:ncol(anno.sub3))])) > num), ]
+    anno.sub4 <- anno.sub3[!(rowSums(is.na(anno.sub3[ , 22:ncol(anno.sub3), drop = FALSE])) > num), ]
 
     if (remove.homer.annot.cols) {
-      anno.sub4 <- anno.sub4[ ,c(15,16,18,19,22:ncol(anno.sub4))]
+      anno.sub4 <- anno.sub4[ ,c(1,15,16,18,19,22:ncol(anno.sub4))]
     }
+    colnames(anno.sub4)[1] <- "DMR_ID"
     
     # anno result table now contains:
     # rows genes from the motif search analysis which contain at least one TF motif (with qval < qval (0.05)) in the promoter
